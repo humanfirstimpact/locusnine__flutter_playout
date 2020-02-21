@@ -15,6 +15,12 @@ import org.json.JSONObject;
 
 import java.lang.ref.WeakReference;
 
+import java.net.HttpCookie;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import io.flutter.plugin.common.BinaryMessenger;
 import io.flutter.plugin.common.EventChannel;
 import io.flutter.plugin.common.JSONMethodCodec;
@@ -43,6 +49,10 @@ public class AudioPlayer implements MethodChannel.MethodCallHandler, EventChanne
     private String title;
 
     private String subtitle;
+
+    private List<HttpCookie> cookies;
+
+    private Map<String, String> headers;
 
     private int startPositionInMills;
 
@@ -94,6 +104,10 @@ public class AudioPlayer implements MethodChannel.MethodCallHandler, EventChanne
             audioServiceBinder.setTitle(title);
 
             audioServiceBinder.setSubtitle(subtitle);
+
+            audioServiceBinder.setHeaders(headers);
+
+            audioServiceBinder.setCookies(cookies);
 
             audioServiceBinder.setAudioProgressUpdateHandler(audioProgressUpdateHandler);
 
@@ -187,6 +201,8 @@ public class AudioPlayer implements MethodChannel.MethodCallHandler, EventChanne
         this.title = (String) args.get("title");
 
         this.subtitle = (String) args.get("subtitle");
+
+        this.extractHeadersAndCookies(args);
 
         try {
 
@@ -357,6 +373,24 @@ public class AudioPlayer implements MethodChannel.MethodCallHandler, EventChanne
         } catch (Exception e) {
 
             Log.e(TAG, "onDuration: ", e);
+        }
+    }
+
+    private void extractHeadersAndCookies(java.util.HashMap<String, Object> args){
+        System.out.println(args);
+
+        Map<String, String> headers = (Map<String, String>)args.get("headers");
+
+        if(headers != null)
+            this.headers = headers;
+        else
+            this.headers = new HashMap<String, String>();
+
+        Map<String, String> cookies = (Map<String, String>)args.get("cookies");
+        this.cookies = new ArrayList<HttpCookie>();
+        if(cookies.size() > 0){
+            for (String key : cookies.keySet())
+                this.cookies.add(new HttpCookie(key, cookies.get(key)));
         }
     }
 

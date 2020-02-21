@@ -31,19 +31,34 @@ class Audio {
       {String title = "",
       String subtitle = "",
       Duration position = Duration.zero,
-      bool isLiveStream = false}) async {
+      bool isLiveStream = false,
+      Map headers = null, 
+      Map cookies = null}) async {
     if (_hasDataChanged(url, title, subtitle, position, isLiveStream)) {
       this._url = url;
       this._title = title;
       this._subtitle = subtitle;
       this._position = position;
       this._isLiveStream = isLiveStream;
+
+      var headersMap = {}, cookiesMap = {};
+
+      (headers ?? new Map()).keys.forEach((key){
+        headersMap[key] = headers[key];
+      });
+
+      (cookies ?? new Map()).keys.forEach((key){
+        cookiesMap[key] = cookies[key];
+      });
+
       return _audioChannel.invokeMethod("play", <String, dynamic>{
         "url": url,
         "title": title,
         "subtitle": subtitle,
         "position": position.inMilliseconds,
         "isLiveStream": isLiveStream,
+        "headers": headersMap,
+        "cookies": cookiesMap
       });
     }
   }

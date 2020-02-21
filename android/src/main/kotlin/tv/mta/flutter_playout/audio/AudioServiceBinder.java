@@ -7,6 +7,7 @@ import android.app.NotificationManager;
 import android.content.ComponentName;
 import android.content.Context;
 import android.media.MediaPlayer;
+import android.net.Uri;
 import android.os.Binder;
 import android.os.Build;
 import android.os.Handler;
@@ -22,6 +23,12 @@ import androidx.annotation.RequiresApi;
 import androidx.core.app.NotificationCompat;
 
 import java.io.IOException;
+
+import java.net.HttpCookie;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import tv.mta.flutter_playout.FlutterAVPlayer;
 import tv.mta.flutter_playout.PlayerNotificationUtil;
@@ -71,6 +78,10 @@ public class AudioServiceBinder
 
     private String subtitle;
 
+    private List<HttpCookie> cookies;
+
+    private Map<String, String> headers;
+
     private MediaPlayer audioPlayer = null;
 
     private int startPositionInMills = 0;
@@ -98,6 +109,22 @@ public class AudioServiceBinder
 
     void setAudioFileUrl(String audioFileUrl) {
         this.audioFileUrl = audioFileUrl;
+    }
+
+    void setCookies(List<HttpCookie> cookies){ this.cookies = cookies; }
+
+    void setHeaders(Map<String, String> headers){ this.headers = headers; }
+
+    Map<String, String> getHeaders(){
+        if(this.headers == null) return new HashMap<String, String>();
+        return this.headers;
+    }
+
+    List<HttpCookie> getCookies(){
+        if(this.cookies == null)
+            return new ArrayList<HttpCookie>();
+
+        return this.cookies;
     }
 
     void setTitle(String title) {
@@ -227,9 +254,27 @@ public class AudioServiceBinder
 
                 audioPlayer = new MediaPlayer();
 
+                Map<String, String> headers = getHeaders();
+
                 if (!TextUtils.isEmpty(getAudioFileUrl())) {
 
-                    audioPlayer.setDataSource(getAudioFileUrl());
+                    List<HttpCookie> cookies = getCookies();
+
+                    if(cookies.size() > 0){
+                        StringBuilder cookieContent = new StringBuilder();
+                        for(int i=0; i<cookies.size(); i++){
+                            HttpCookie cookie = cookies.get(i);
+                            cookieContent.append(cookie.getName());
+                            cookieContent.append("=");
+                            cookieContent.append(cookie.getValue());
+                            if(i < cookies.size() - 1)
+                                cookieContent.append(";");
+                        }
+
+                        headers.put("Cookie", cookieContent.toString());
+                    }
+
+                    audioPlayer.setDataSource(getContext(), Uri.parse(getAudioFileUrl()), headers);
                 }
 
                 audioPlayer.setOnPreparedListener(this);
