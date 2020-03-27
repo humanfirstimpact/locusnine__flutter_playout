@@ -257,7 +257,7 @@ public class AudioPlayer implements MethodChannel.MethodCallHandler, EventChanne
 
             audioServiceBinder.cleanPlayerNotification();
 
-            audioServiceBinder = null;
+            //audioServiceBinder = null;
         }
     }
 

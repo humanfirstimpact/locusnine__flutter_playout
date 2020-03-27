@@ -1,3 +1,19 @@
+## 1.0.33 [March 23, 2020]
+
+* Merged PR (https://github.com/muslimtv/flutter_playout/pull/29)
+
+## 1.0.32 [March 23, 2020]
+
+* Merged PR (https://github.com/muslimtv/flutter_playout/pull/28)
+
+* Fixed wrong arguments casting in Android PlayerLayout. It was throwing exception and the change wouldn't happen.
+
+* Fixed crash on iOS when attempting to change media. It was crashing due to force unwrapping a non existing value (showControls).
+
+## 1.0.31 [March 23, 2020]
+
+* Merged PR to add progressive video source for Android (https://github.com/muslimtv/flutter_playout/pull/26)
+
 ## 1.0.30 [February 15, 2020]
 
 * Fixed an issue causing audio player to re-initialize on widget rebuild even though param 
